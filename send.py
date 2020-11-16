@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-import os, sys
+import os, sys, time
 import socket
 
 Taro = '192.168.3.201'
@@ -21,7 +21,9 @@ DST_PORT = 10001
 
 #file size
 FILE_SIZE = 102400
-DATA_SIZE = 51200
+SEC_SIZE = 100
+DATA_SIZE = FILE_SIZE//SEC_SIZE
+SLEEP_TIME = 0.01
 
 #get files
 DATA_PATH = "./data/"
@@ -39,20 +41,17 @@ for data_file in data_files:
     start = 0
     end = DATA_SIZE
 
-    for i in range(FILE_SIZE//DATA_SIZE):
+    for i in range(SEC_SIZE):
         #make packet
         raw = data[start:end]
         print(data_file,i,len(raw))
-        #print(raw_)
-        #pkt = IP_HEADER/UDP_HEADER/raw_
-        #print(raw(pkt))
+
         #send and recv packet
-        #send(pkt)
-        #sr1(pkt)
         tcp_client.send(raw)
         tcp_client.recv(10)
+        time.sleep(SLEEP_TIME)
 #        response = tcp_client.recv(DATA_SIZE)
- #       print(response)
+#        print(response)
 
         #--------------------------------
         #ここにパケット紛失時の処理を書く

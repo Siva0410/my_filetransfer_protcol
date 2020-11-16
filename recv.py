@@ -24,7 +24,9 @@ LISTEN = 5
 
 #file size
 FILE_SIZE = 102400
-DATA_SIZE = 51200
+SEC_SIZE = 100
+DATA_SIZE = FILE_SIZE//SEC_SIZE
+RECV_SIZE = DATA_SIZE
 
 #get files
 RECV_PATH = "./recv/"
@@ -44,10 +46,10 @@ for i in range(int(sys.argv[2])):
     start = 0
     end = DATA_SIZE + 1
     data = ""
-    for i in range(FILE_SIZE//DATA_SIZE):
+    for j in range(SEC_SIZE):
         #send and recv packet
-        data = data + conn.recv(DATA_SIZE).decode()
-        print("[*] Received Data : {}".format(data))
+        data = data + conn.recv(RECV_SIZE).decode()
+        print("[*] Received Data : File {} Sec {}".format(i,j))
         conn.send(b'ACK')
         # --------------------------------
         # ここにパケット紛失時の処理を書く
