@@ -1,6 +1,6 @@
 import os
 import socket
-#from scapy.all import *
+from scapy.all import *
 
 #Taro 169.254.219.169
 #Hanako 169.254.107.46
@@ -18,49 +18,40 @@ DATA_PATH = "./data/"
 data_files = os.listdir(DATA_PATH)
 
 #header
-# IP_HEADER = IP(dst=DST_IP, src=SRC_IP)
-# TCP_HEADER = TCP(dport=DST_PORT, sport=SRC_PORT)
-# UDP_HEADER = UDP(dport=DST_PORT, sport=SRC_PORT)
-
-tcp_client =  socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-tcp_client.connect((DST_IP, DST_PORT))
+IP_HEADER = IP(dst=DST_IP, src=SRC_IP)
+TCP_HEADER = TCP(dport=DST_PORT, sport=SRC_PORT)
+UDP_HEADER = UDP(dport=DST_PORT, sport=SRC_PORT)
 
 
-
-    
 for data_file in data_files:
     #read file
-    f = open(DATA_PATH+data_file,'rb')
+    f = open(DATA_PATH+data_file,'r')
     data = f.read()
     
     #init
     start = 0
-    end = DATA_SIZE
-
+    end = DATA_SIZE + 1
+    
     for i in range(FILE_SIZE//DATA_SIZE):
         #make packet
-        raw = data[start:end]
-        print(len(raw))
+        raw_ = data[start:end]
         #print(raw_)
-        #pkt = IP_HEADER/UDP_HEADER/raw_
+        pkt = IP_HEADER/UDP_HEADER/raw_
         #print(raw(pkt))
         #send and recv packet
-        #send(pkt)
+        send(pkt)
         #sr1(pkt)
-        tcp_client.send(raw)
-
-#        response = tcp_client.recv(DATA_SIZE)
- #       print(response)
-
         #--------------------------------
         #ここにパケット紛失時の処理を書く
         #-------------------------------- 
         #set next packet
         start = end
-        end = start + DATA_SIZE
+        end = start + DATA_SIZE + 1
         
     #close file
     f.close()    
     
 
 
+#with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+#    s.sendto(b'Hello UDP', ('127.0.0.1', 10001))
