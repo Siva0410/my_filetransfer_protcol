@@ -1,4 +1,6 @@
-import os
+#! /usr/bin/env python3
+
+import os, sys
 import socket
 #from scapy.all import *
 
@@ -20,7 +22,8 @@ FILE_SIZE = 102400
 DATA_SIZE = 51200
 
 #get files
-DATA_PATH = "./data/"
+RECV_PATH = "./recv/"
+os.makedirs(RECV_PATH, exist_ok=True)
 
 tcp_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 tcp_server.bind((SRC_IP, SRC_PORT))
@@ -28,9 +31,9 @@ tcp_server.listen(LISTEN)
 client,address = tcp_server.accept()
 print("[*] Connected!! [ Source : {}]".format(address))
 
-for i in range(1):
+for i in range(int(sys.argv[1])):
     #read file
-    f = open(DATA_PATH+"data"+str(i),'w')
+    f = open(os.path.join(RECV_PATH, "recv"+str(i)),'w')
     
     #init
     start = 0
