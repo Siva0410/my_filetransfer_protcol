@@ -2,20 +2,25 @@
 
 import os, sys
 import socket
-#from scapy.all import *
 
-#Taro 169.254.219.169
-#Hanako 169.254.107.46
-SRC_IP = 'localhost'
+Taro = '192.168.3.201'
+Hanako = '192.168.3.14'
+
+if sys.argv[1] == 'Taro':
+    SRC_IP = Taro
+    DST_IP = Hanako
+elif sys.argv[1] == 'Hanako':
+    SRC_IP = Hanako
+    DST_IP = Taro
+elif sys.argv[1] == 'local':
+    SRC_IP = 'localhost'
+    DST_IP = 'localhost'
+
+
 SRC_PORT = 10001
-DST_IP = 'localhost'
 DST_PORT = 10000
 
 LISTEN = 5
-#header
-# IP_HEADER = IP(dst=DST_IP, src=SRC_IP)
-# TCP_HEADER = TCP(dport=DST_PORT, sport=SRC_PORT)
-# UDP_HEADER = UDP(dport=DST_PORT, sport=SRC_PORT)
 
 #file size
 FILE_SIZE = 102400
@@ -28,10 +33,10 @@ os.makedirs(RECV_PATH, exist_ok=True)
 tcp_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 tcp_server.bind((SRC_IP, SRC_PORT))
 tcp_server.listen(LISTEN)
-client,address = tcp_server.accept()
+conn, address = tcp_server.accept()
 print("[*] Connected!! [ Source : {}]".format(address))
 
-for i in range(int(sys.argv[1])):
+for i in range(int(sys.argv[2])):
     #read file
     f = open(os.path.join(RECV_PATH, "recv"+str(i)),'w')
     
@@ -41,8 +46,9 @@ for i in range(int(sys.argv[1])):
     data = ""
     for i in range(FILE_SIZE//DATA_SIZE):
         #send and recv packet
-        data = data + client.recv(DATA_SIZE).decode()
+        data = data + conn.recv(DATA_SIZE).decode()
         print("[*] Received Data : {}".format(data))
+        conn.send(b'ACK')
         # --------------------------------
         # ここにパケット紛失時の処理を書く
         # -------------------------------- 
@@ -56,4 +62,4 @@ for i in range(int(sys.argv[1])):
     f.close()
 
 
-client.close()
+conn.close()

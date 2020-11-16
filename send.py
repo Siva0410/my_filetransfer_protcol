@@ -1,14 +1,22 @@
 #! /usr/bin/env python3
 
-import os
+import os, sys
 import socket
-#from scapy.all import *
 
-#Taro 169.254.219.169
-#Hanako 169.254.107.46
-SRC_IP = 'localhost'
+Taro = '192.168.3.201'
+Hanako = '192.168.3.14'
+
+if sys.argv[1] == 'Taro':
+    SRC_IP = Taro
+    DST_IP = Hanako
+elif sys.argv[1] == 'Hanako':
+    SRC_IP = Hanako
+    DST_IP = Taro
+elif sys.argv[1] == 'local':
+    SRC_IP = 'localhost'
+    DST_IP = 'localhost'
+
 SRC_PORT = 10000
-DST_IP = 'localhost'
 DST_PORT = 10001
 
 #file size
@@ -19,17 +27,9 @@ DATA_SIZE = 51200
 DATA_PATH = "./data/"
 data_files = os.listdir(DATA_PATH)
 
-#header
-# IP_HEADER = IP(dst=DST_IP, src=SRC_IP)
-# TCP_HEADER = TCP(dport=DST_PORT, sport=SRC_PORT)
-# UDP_HEADER = UDP(dport=DST_PORT, sport=SRC_PORT)
-
-tcp_client =  socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+tcp_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 tcp_client.connect((DST_IP, DST_PORT))
 
-
-
-    
 for data_file in data_files:
     #read file
     f = open(DATA_PATH+data_file,'rb')
@@ -42,7 +42,7 @@ for data_file in data_files:
     for i in range(FILE_SIZE//DATA_SIZE):
         #make packet
         raw = data[start:end]
-        print(len(raw))
+        print(data_file,i,len(raw))
         #print(raw_)
         #pkt = IP_HEADER/UDP_HEADER/raw_
         #print(raw(pkt))
@@ -50,7 +50,7 @@ for data_file in data_files:
         #send(pkt)
         #sr1(pkt)
         tcp_client.send(raw)
-
+        tcp_client.recv(10)
 #        response = tcp_client.recv(DATA_SIZE)
  #       print(response)
 
