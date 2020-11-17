@@ -3,8 +3,8 @@
 import os, sys, time
 import socket
 
-Taro = '192.168.3.201'
-Hanako = '192.168.3.14'
+Taro = '169.254.155.219'
+Hanako = '169.254.229.153'
 
 if sys.argv[1] == 'Taro':
     SRC_IP = Taro
@@ -19,6 +19,9 @@ elif sys.argv[1] == 'local':
 SRC_PORT = 10000
 DST_PORT = 10001
 
+SRC = (SRC_IP, SRC_PORT)
+DST = (DST_IP, DST_PORT)
+
 #file size
 FILE_SIZE = 102400
 SEC_SIZE = 100
@@ -29,10 +32,9 @@ SLEEP_TIME = 0.01
 DATA_PATH = "./data/"
 data_files = os.listdir(DATA_PATH)
 
-tcp_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-tcp_client.connect((DST_IP, DST_PORT))
+udp_client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-for data_file in data_files:
+for data_file in data_files[:int(sys.argv[2])]:
     #read file
     f = open(DATA_PATH+data_file,'rb')
     data = f.read()
@@ -47,8 +49,8 @@ for data_file in data_files:
         print(data_file,i,len(raw))
 
         #send and recv packet
-        tcp_client.send(raw)
-        tcp_client.recv(10)
+        udp_client.sendto(raw, DST)
+#        udp_client.recvfrom(10)
         time.sleep(SLEEP_TIME)
 #        response = tcp_client.recv(DATA_SIZE)
 #        print(response)
