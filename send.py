@@ -16,8 +16,8 @@ elif sys.argv[1] == 'local':
     SRC_IP = 'localhost'
     DST_IP = 'localhost'
 
-SRC_PORT = 10000
-DST_PORT = 10001
+SRC_PORT = 50000
+DST_PORT = 50001
 
 SRC = (SRC_IP, SRC_PORT)
 DST = (DST_IP, DST_PORT)
@@ -26,7 +26,7 @@ DST = (DST_IP, DST_PORT)
 FILE_SIZE = 102400
 SEC_SIZE = 100
 DATA_SIZE = FILE_SIZE//SEC_SIZE
-SLEEP_TIME = 0.01
+SLEEP_TIME = 0.0001
 
 #get files
 DATA_PATH = "./data/"

@@ -17,8 +17,8 @@ elif sys.argv[1] == 'local':
     DST_IP = 'localhost'
 
 
-SRC_PORT = 10001
-DST_PORT = 10000
+SRC_PORT = 50001
+DST_PORT = 50000
 
 SRC = (SRC_IP, SRC_PORT)
 DST = (DST_IP, DST_PORT)
