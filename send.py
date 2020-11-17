@@ -51,7 +51,7 @@ for i, data_file in enumerate(data_files[:int(sys.argv[2])]):
     recv_data = ""
     for j in range(SEC_SIZE):
         #make packet
-        header = i.to_bytes(2,'little') + j.to_bytes(1,'little')
+        header = (i).to_bytes(2,'little') + j.to_bytes(1,'little')
         print(len(header))
         raw = header + send_data[start:end]
         print(data_file,j,len(raw))
@@ -65,12 +65,7 @@ for i, data_file in enumerate(data_files[:int(sys.argv[2])]):
         print("[*] Received Data : Recv {} From {}".format(recv_data,recv_addr))
 
         #time.sleep(SLEEP_TIME)
-#        response = tcp_send.recv(DATA_SIZE)
-#        print(response)
 
-        #--------------------------------
-        #ここにパケット紛失時の処理を書く
-        #-------------------------------- 
         #set next packet
         start = end
         end = start + DATA_SIZE

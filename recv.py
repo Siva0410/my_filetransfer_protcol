@@ -23,49 +23,46 @@ DST_PORT = 50000
 SRC = (SRC_IP, SRC_PORT)
 DST = (DST_IP, DST_PORT)
 
+#header
+FILENO_SIZE = 2
+PKTNO_SIZE = 1
+HEADER_SIZE = FILENO_SIZE + PKTNO_SIZE
+
 #file size
 FILE_SIZE = 102400
 SEC_SIZE = 100
 DATA_SIZE = FILE_SIZE//SEC_SIZE
-HEAD_SIZE = 2+1
-PKT_SIZE = FILE_SIZE//SEC_SIZE + HEAD_SIZE
+PKT_SIZE = FILE_SIZE//SEC_SIZE + HEADER_SIZE
 
 #get files
 RECV_PATH = "./recv/"
 os.makedirs(RECV_PATH, exist_ok=True)
 
+#udp_recv 
 udp_recv = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 udp_recv.bind(SRC)
 
+#udp_send
 udp_send = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
-#print("[*] Connected!! [ Source : {}]".format(address))
 
 for i in range(int(sys.argv[2])):
     #read file
     f = open(os.path.join(RECV_PATH, "recv"+str(i)),'w')
     
     #init
-    start = 0
-    end = DATA_SIZE + 1
     recv_data = ""
+    
     for j in range(SEC_SIZE):
         #send and recv packet
         recv_binary_data, recv_addr = udp_recv.recvfrom(PKT_SIZE)
-        recv_header = recv_binary_data[:HEAD_SIZE]
-        fileno, pktno = int.from_bytes(recv_header[:2], 'little'),int.from_bytes(recv_header[2:], 'little')
-        recv_data = recv_data + recv_binary_data[HEAD_SIZE:].decode()
+        recv_header = recv_binary_data[:HEADER_SIZE]
+        fileno, pktno = int.from_bytes(recv_header[:FILENO_SIZE], 'little'),int.from_bytes(recv_header[FILENO_SIZE:], 'little')
+        recv_data = recv_data + recv_binary_data[HEADER_SIZE:].decode()
         
         print("[*] Received Data : File {} Sec {} From {}".format(fileno, pktno, recv_addr))
         udp_send.sendto(b'ACK', DST)
-        # --------------------------------
-        # ここにパケット紛失時の処理を書く
-        # -------------------------------- 
-        #set next packet
-        start = end
-        end = start + DATA_SIZE + 1
         
-        
+    #write file
     f.write(recv_data)
     #close file
     f.close()
