@@ -25,34 +25,47 @@ DST = (DST_IP, DST_PORT)
 #file size
 FILE_SIZE = 102400
 SEC_SIZE = 100
+HEAD_SIZE = 2+1
 DATA_SIZE = FILE_SIZE//SEC_SIZE
+PKT_SIZE = FILE_SIZE//SEC_SIZE + HEAD_SIZE
+RECV_SIZE = 30
+
 SLEEP_TIME = 0.0001
 
 #get files
 DATA_PATH = "./data/"
 data_files = os.listdir(DATA_PATH)
 
-udp_client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+udp_send = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+udp_recv = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+udp_recv.bind(SRC)
 
-for data_file in data_files[:int(sys.argv[2])]:
+for i, data_file in enumerate(data_files[:int(sys.argv[2])]):
     #read file
     f = open(DATA_PATH+data_file,'rb')
-    data = f.read()
+    send_data = f.read()
     
     #init
     start = 0
     end = DATA_SIZE
-
-    for i in range(SEC_SIZE):
+    recv_data = ""
+    for j in range(SEC_SIZE):
         #make packet
-        raw = data[start:end]
-        print(data_file,i,len(raw))
+        header = i.to_bytes(2,'little') + j.to_bytes(1,'little')
+        print(len(header))
+        raw = header + send_data[start:end]
+        print(data_file,j,len(raw))
 
-        #send and recv packet
-        udp_client.sendto(raw, DST)
-        udp_client.recvfrom(10)
-        time.sleep(SLEEP_TIME)
-#        response = tcp_client.recv(DATA_SIZE)
+        #send  packet
+        udp_send.sendto(raw, DST)
+
+        #recv packet
+        recv_binary_data, recv_addr = udp_recv.recvfrom(RECV_SIZE)
+        recv_data = recv_binary_data.decode()
+        print("[*] Received Data : Recv {} From {}".format(recv_data,recv_addr))
+
+        #time.sleep(SLEEP_TIME)
+#        response = tcp_send.recv(DATA_SIZE)
 #        print(response)
 
         #--------------------------------
