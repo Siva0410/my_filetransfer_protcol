@@ -3,8 +3,8 @@
 import os, sys, time
 import socket
 
-Taro = '192.168.3.201'
-Hanako = '192.168.3.14'
+Taro = '169.254.155.219'
+Hanako = '169.254.229.153'
 
 if sys.argv[1] == 'Taro':
     SRC_IP = Taro
