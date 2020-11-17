@@ -52,7 +52,7 @@ for i in range(int(sys.argv[2])):
         recv_data, addr = udp_server.recvfrom(RECV_SIZE)
         data = data + recv_data.decode()
         print("[*] Received Data : File {} Sec {} From {}".format(i,j,addr))
-#        conn.send(b'ACK')
+        udp_server.sendto(b'ACK', DST)
         # --------------------------------
         # ここにパケット紛失時の処理を書く
         # -------------------------------- 

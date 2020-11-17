@@ -50,7 +50,7 @@ for data_file in data_files[:int(sys.argv[2])]:
 
         #send and recv packet
         udp_client.sendto(raw, DST)
-#        udp_client.recvfrom(10)
+        udp_client.recvfrom(10)
         time.sleep(SLEEP_TIME)
 #        response = tcp_client.recv(DATA_SIZE)
 #        print(response)
