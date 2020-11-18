@@ -28,7 +28,7 @@ SEC_SIZE = 100
 HEAD_SIZE = 2+1
 DATA_SIZE = FILE_SIZE//SEC_SIZE
 PKT_SIZE = FILE_SIZE//SEC_SIZE + HEAD_SIZE
-RECV_SIZE = 30
+RECV_SIZE = 150
 
 SLEEP_TIME = 0.0001
 
@@ -73,5 +73,3 @@ for i, data_file in enumerate(data_files[:int(sys.argv[2])]):
     #close file
     f.close()    
     
-
-
