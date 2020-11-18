@@ -2,6 +2,7 @@
 
 import os, sys, time
 import socket
+import random
 
 Taro = '169.254.155.219'
 Hanako = '169.254.229.153'
@@ -46,38 +47,44 @@ udp_send = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 udp_recv = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 udp_recv.bind(SRC)
 
+raws = []
 for fileno, data_file in enumerate(data_files[:FILE_NUM]):
     #read file
     f = open(DATA_PATH+data_file,'rb')
     send_data = f.read()
-    
+            
     #init
     start = 0
     end = DATA_SIZE
     recv_data = ""
-    raws = [None for i in range(SEC_SIZE)]
     for pktno in range(SEC_SIZE):
 
         #make packet
         header = fileno.to_bytes(FILENO_SIZE,'little') + pktno.to_bytes(PKTNO_SIZE,'little')
         raw = header + send_data[start:end]
 
-        #send  packet
-        udp_send.sendto(raw, DST)
-        
-        print("[*] Sended Data : File {} Pkt {} To {}".format(fileno, pktno, DST_IP))
-        
-        #recv packet
-        recv_binary_data, recv_addr = udp_recv.recvfrom(RECV_SIZE)
-        recv_data = recv_binary_data.decode()
-        print("[*] Received Data : Recv {} From {}".format(recv_data,recv_addr))
-
-        #time.sleep(SLEEP_TIME)
+        raws.append(raw)
 
         #set next packet
         start = end
         end = start + DATA_SIZE
-        
+
     #close file
     f.close()    
     
+        
+random.shuffle(raws)
+
+for pktno in range(SEC_SIZE*FILE_NUM):
+    #send  packet
+    udp_send.sendto(raws[pktno], DST)
+    
+    print("[*] Sended Data : File {} Pkt {} To {}".format(fileno, pktno, DST_IP))
+    
+    #recv packet
+    recv_binary_data, recv_addr = udp_recv.recvfrom(RECV_SIZE)
+    recv_data = recv_binary_data.decode()
+    print("[*] Received Data : Recv {} From {}".format(recv_data,recv_addr))
+    
+    #time.sleep(SLEEP_TIME)
+
