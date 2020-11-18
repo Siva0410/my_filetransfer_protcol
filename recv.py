@@ -46,10 +46,7 @@ udp_recv.bind(SRC)
 #udp_send
 udp_send = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-
-recv_list = [None for _ in range(SEC_SIZE)]
-file_data = [recv_list for _ in range(FILE_NUM)]
-pkt_list = [i for i in range(SEC_SIZE)]
+file_data = [[None for _ in range(SEC_SIZE)] for _ in range(FILE_NUM)]
 
 #init
 last_fileno = -1
@@ -61,19 +58,21 @@ for _ in range(FILE_NUM*SEC_SIZE):
     recv_binary_data, recv_addr = udp_recv.recvfrom(PKT_SIZE)
     recv_header = recv_binary_data[:HEADER_SIZE]
     fileno, pktno = int.from_bytes(recv_header[:FILENO_SIZE], 'little'),int.from_bytes(recv_header[FILENO_SIZE:], 'little')
-        
+    
+    print("[*] Received Data : File {} Pkt {} From {}".format(fileno, pktno, recv_addr))
+    
     #create new file storage
     if last_fileno < fileno:
         last_fileno = fileno
-        
+
     #add pkt to file storage
     file_data[fileno][pktno] = recv_binary_data[HEADER_SIZE:].decode()
-    
-    for i in range(base_fileno,last_fileno+1):
+
+    for i in range(base_fileno,(last_fileno+1)):
         if None not in file_data[i]:
             for s in file_data[i]:
                 recv_data += s
-            print(recv_data)        
+            #print(recv_data)        
             #read file
             f = open(os.path.join(RECV_PATH, "recv"+str(i)),'w')
             #write file
@@ -84,7 +83,6 @@ for _ in range(FILE_NUM*SEC_SIZE):
             base_fileno += 1
             print("[*] Write recv{} file! ".format(i))
                
-    print("[*] Received Data : File {} Sec {} From {}".format(fileno, pktno, recv_addr))
     udp_send.sendto(b'ACK', DST)
         
     
