@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-import os, sys, time
+import os, sys, time, signal
 import socket
 import random
 
@@ -38,7 +38,7 @@ PKT_SIZE = FILE_SIZE//SEC_SIZE + HEADER_SIZE
 RECV_SIZE = 150
 
 SLEEP_TIME = 0.0001
-
+INTERRUPT_TIME = 0.5
 #get files
 DATA_PATH = "./data/"
 data_files = os.listdir(DATA_PATH)
@@ -47,7 +47,28 @@ udp_send = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 udp_recv = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 udp_recv.bind(SRC)
 
-raws = []
+raws = [[] for _ in range(FILE_NUM)]
+priority_pkts = set()
+#interrupt func
+def recv_cannot_send(arg1, arg2):
+    #recv packete
+    recv_binary_data, recv_addr = udp_recv.recvfrom(RECV_SIZE)
+    
+    start = 0
+    end = HEADER_SIZE
+    for i in range(50):
+        fileno, pktno = int.from_bytes(recv_binary_data[start:start+FILENO_SIZE], 'little'),int.from_bytes(recv_binary_data[start+FILENO_SIZE:end], 'little')
+        print(fileno, pktno)
+        priority_pkts.add((fileno,pktno))
+
+        start = end
+        end = start + HEADER_SIZE
+        
+    #print("[*] Received Data : Recv {} From {}".format(recv_data,recv_addr))
+    
+signal.signal(signal.SIGALRM, recv_cannot_send)
+signal.setitimer(signal.ITIMER_REAL, INTERRUPT_TIME, INTERRUPT_TIME)
+
 for fileno, data_file in enumerate(data_files[:FILE_NUM]):
     #read file
     f = open(DATA_PATH+data_file,'rb')
@@ -63,7 +84,7 @@ for fileno, data_file in enumerate(data_files[:FILE_NUM]):
         header = fileno.to_bytes(FILENO_SIZE,'little') + pktno.to_bytes(PKTNO_SIZE,'little')
         raw = header + send_data[start:end]
 
-        raws.append(raw)
+        raws[fileno].append(raw)
 
         #set next packet
         start = end
@@ -72,19 +93,21 @@ for fileno, data_file in enumerate(data_files[:FILE_NUM]):
     #close file
     f.close()    
     
-        
-random.shuffle(raws)
+#shuffle
+#random.shuffle(raws)
+for fileno in range(FILE_NUM):
+    for pktno in range(SEC_SIZE):
+        #send  packet
+        priority_pktss = priority_pkts
+        for priority_fileno, priority_pktno in priority_pktss:
+            udp_send.sendto(raws[priority_fileno][priority_pktno], DST)
+            time.sleep(SLEEP_TIME)
 
-for pktno in range(SEC_SIZE*FILE_NUM):
-    #send  packet
-    udp_send.sendto(raws[pktno], DST)
+        udp_send.sendto(raws[fileno][pktno], DST)
+        priority_pkts.discard((fileno, pktno))
     
-    print("[*] Sended Data : File {} Pkt {} To {}".format(fileno, pktno, DST_IP))
+        #print("[*] Sended Data : File {} Pkt {} To {}".format(fileno, pktno, DST_IP))
+        priority_pkts.clear()
+        priority_pktss.clear()
+        time.sleep(SLEEP_TIME)
     
-    #recv packet
-    recv_binary_data, recv_addr = udp_recv.recvfrom(RECV_SIZE)
-    recv_data = recv_binary_data.decode()
-    print("[*] Received Data : Recv {} From {}".format(recv_data,recv_addr))
-    
-    #time.sleep(SLEEP_TIME)
-
