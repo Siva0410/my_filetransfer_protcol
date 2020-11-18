@@ -22,12 +22,18 @@ DST_PORT = 50001
 SRC = (SRC_IP, SRC_PORT)
 DST = (DST_IP, DST_PORT)
 
+
+#header
+FILENO_SIZE = 2
+PKTNO_SIZE = 1
+HEADER_SIZE = FILENO_SIZE + PKTNO_SIZE
+
 #file size
+FILE_NUM = int(sys.argv[2])
 FILE_SIZE = 102400
 SEC_SIZE = 100
-HEAD_SIZE = 2+1
 DATA_SIZE = FILE_SIZE//SEC_SIZE
-PKT_SIZE = FILE_SIZE//SEC_SIZE + HEAD_SIZE
+PKT_SIZE = FILE_SIZE//SEC_SIZE + HEADER_SIZE
 RECV_SIZE = 150
 
 SLEEP_TIME = 0.0001
@@ -40,7 +46,7 @@ udp_send = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 udp_recv = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 udp_recv.bind(SRC)
 
-for i, data_file in enumerate(data_files[:int(sys.argv[2])]):
+for fileno, data_file in enumerate(data_files[:FILE_NUM]):
     #read file
     f = open(DATA_PATH+data_file,'rb')
     send_data = f.read()
@@ -49,16 +55,18 @@ for i, data_file in enumerate(data_files[:int(sys.argv[2])]):
     start = 0
     end = DATA_SIZE
     recv_data = ""
-    for j in range(SEC_SIZE):
+    raws = [None for i in range(SEC_SIZE)]
+    for pktno in range(SEC_SIZE):
+
         #make packet
-        header = (i).to_bytes(2,'little') + j.to_bytes(1,'little')
-        print(len(header))
+        header = fileno.to_bytes(FILENO_SIZE,'little') + pktno.to_bytes(PKTNO_SIZE,'little')
         raw = header + send_data[start:end]
-        print(data_file,j,len(raw))
 
         #send  packet
         udp_send.sendto(raw, DST)
-
+        
+        print("[*] Sended Data : File {} Pkt {} To {}".format(fileno, pktno, DST_IP))
+        
         #recv packet
         recv_binary_data, recv_addr = udp_recv.recvfrom(RECV_SIZE)
         recv_data = recv_binary_data.decode()
