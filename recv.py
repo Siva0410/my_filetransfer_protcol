@@ -70,8 +70,8 @@ def send_not_recv(arg1, arg2):
 signal.signal(signal.SIGALRM, send_not_recv)
 signal.setitimer(signal.ITIMER_REAL, INTERRUPT_TIME, INTERRUPT_TIME)
 
-
-for num in range(FILE_NUM*SEC_SIZE):
+num = 0
+while True:
     #send and recv packet
     recv_binary_data, recv_addr = udp_recv.recvfrom(PKT_SIZE)
     recv_header = recv_binary_data[:HEADER_SIZE]
@@ -109,5 +109,6 @@ for num in range(FILE_NUM*SEC_SIZE):
             if len(not_recv_pkt) < RECV_SIZE:
                 break
 
-        
+
+    num += 1
 

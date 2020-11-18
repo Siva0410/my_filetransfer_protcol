@@ -58,7 +58,7 @@ def recv_cannot_send(arg1, arg2):
     end = HEADER_SIZE
     for i in range(50):
         fileno, pktno = int.from_bytes(recv_binary_data[start:start+FILENO_SIZE], 'little'),int.from_bytes(recv_binary_data[start+FILENO_SIZE:end], 'little')
-        print(fileno, pktno)
+
         priority_pkts.add((fileno,pktno))
 
         start = end
@@ -95,6 +95,7 @@ for fileno, data_file in enumerate(data_files[:FILE_NUM]):
     
 #shuffle
 #random.shuffle(raws)
+
 for fileno in range(FILE_NUM):
     for pktno in range(SEC_SIZE):
         #send  packet
@@ -106,8 +107,11 @@ for fileno in range(FILE_NUM):
         udp_send.sendto(raws[fileno][pktno], DST)
         priority_pkts.discard((fileno, pktno))
     
-        #print("[*] Sended Data : File {} Pkt {} To {}".format(fileno, pktno, DST_IP))
+        print("[*] Sended Data : File {} Pkt {} To {}".format(fileno, pktno, DST_IP))
         priority_pkts.clear()
         priority_pktss.clear()
         time.sleep(SLEEP_TIME)
-    
+
+
+while True:
+    time.sleep(SLEEP_TIME)
