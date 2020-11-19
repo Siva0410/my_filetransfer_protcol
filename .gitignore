@@ -1,3 +1,4 @@
 data/*
 recv/*
 check.md5
+*.sh
