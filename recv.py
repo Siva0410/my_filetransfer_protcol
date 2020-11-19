@@ -29,7 +29,7 @@ PKTNO_SIZE = 1
 HEADER_SIZE = FILENO_SIZE + PKTNO_SIZE
 
 #file size
-FILE_NUM = int(sys.argv[2])
+FILE_NUM = 1000
 FILE_SIZE = 102400
 SEC_SIZE = 25
 DATA_SIZE = FILE_SIZE//SEC_SIZE
@@ -40,7 +40,7 @@ SLEEP_TIME = 0.0005
 INTERRUPT_TIME = 0.0005
 
 #get files
-RECV_PATH = "./data/"
+RECV_PATH = "/home/pi/robust/data/"
 os.makedirs(RECV_PATH, exist_ok=True)
 
 #udp_recv 

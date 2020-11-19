@@ -30,7 +30,7 @@ PKTNO_SIZE = 1
 HEADER_SIZE = FILENO_SIZE + PKTNO_SIZE
 
 #file size
-FILE_NUM = int(sys.argv[2])
+FILE_NUM = 1000
 FILE_SIZE = 102400
 SEC_SIZE = 25
 DATA_SIZE = FILE_SIZE//SEC_SIZE
@@ -41,7 +41,7 @@ SPLIT_NUM = 10
 SLEEP_TIME = 0.001
 INTERRUPT_TIME = 0.005
 #get files
-DATA_PATH = "./data/"
+DATA_PATH = "/home/pi/robust/data/"
 data_files = os.listdir(DATA_PATH)
 
 udp_send = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
