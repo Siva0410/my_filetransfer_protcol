@@ -17,7 +17,7 @@ elif sys.argv[1] == 'local':
     DST_IP = 'localhost'
 
 
-SRC_PORT = 50001
+SRC_PORT = 50002
 DST_PORT = 50000
 
 SRC = (SRC_IP, SRC_PORT)
@@ -34,10 +34,10 @@ FILE_SIZE = 102400
 SEC_SIZE = 100
 DATA_SIZE = FILE_SIZE//SEC_SIZE
 PKT_SIZE = FILE_SIZE//SEC_SIZE + HEADER_SIZE
-RECV_SIZE = 150
+RECV_SIZE = 300
 
 SLEEP_TIME = 0.0001
-INTERRUPT_TIME = 0.01
+INTERRUPT_TIME = 0.1
 
 #get files
 RECV_PATH = "./recv/"
@@ -61,8 +61,8 @@ comp_fileno = set()
 not_recv_pkt = b''
 
 def send_not_recv(arg1, arg2):
-    #再送処理
     global not_recv_pkt
+    #print(not_recv_pkt)
     udp_send.sendto(not_recv_pkt, DST)
     not_recv_pkt = b''
     #time.sleep(SLEEP_TIME)
@@ -77,7 +77,7 @@ while True:
     recv_header = recv_binary_data[:HEADER_SIZE]
     fileno, pktno = int.from_bytes(recv_header[:FILENO_SIZE], 'little'),int.from_bytes(recv_header[FILENO_SIZE:], 'little')
     
-    print("[*] Received Data : File {} Pkt {} From {}".format(fileno, pktno, recv_addr))
+    print("[*] Comp {} :: Received Data : File {} Pkt {} From {}".format(len(comp_fileno),fileno, pktno, recv_addr))
     
     #create new file storage
 
@@ -104,9 +104,9 @@ while True:
 
 
         for pktno in [j for j in range(SEC_SIZE) if file_data[i][j] == None]:
-            print(pktno)
+            #print(pktno)
             not_recv_pkt += i.to_bytes(FILENO_SIZE,'little') + pktno.to_bytes(PKTNO_SIZE,'little')
-            if len(not_recv_pkt) < RECV_SIZE:
+            if len(not_recv_pkt) > RECV_SIZE:
                 break
 
 

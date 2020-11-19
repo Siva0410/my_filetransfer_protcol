@@ -18,7 +18,7 @@ elif sys.argv[1] == 'local':
     DST_IP = 'localhost'
 
 SRC_PORT = 50000
-DST_PORT = 50001
+DST_PORT = 50002
 
 SRC = (SRC_IP, SRC_PORT)
 DST = (DST_IP, DST_PORT)
@@ -35,10 +35,10 @@ FILE_SIZE = 102400
 SEC_SIZE = 100
 DATA_SIZE = FILE_SIZE//SEC_SIZE
 PKT_SIZE = FILE_SIZE//SEC_SIZE + HEADER_SIZE
-RECV_SIZE = 150
+RECV_SIZE = 300
 
 SLEEP_TIME = 0.0001
-INTERRUPT_TIME = 0.5
+INTERRUPT_TIME = 0.1
 #get files
 DATA_PATH = "./data/"
 data_files = os.listdir(DATA_PATH)
@@ -49,6 +49,7 @@ udp_recv.bind(SRC)
 
 raws = [[] for _ in range(FILE_NUM)]
 priority_pkts = set()
+priority_pktss = set()
 #interrupt func
 def recv_cannot_send(arg1, arg2):
     #recv packete
@@ -58,7 +59,7 @@ def recv_cannot_send(arg1, arg2):
     end = HEADER_SIZE
     for i in range(50):
         fileno, pktno = int.from_bytes(recv_binary_data[start:start+FILENO_SIZE], 'little'),int.from_bytes(recv_binary_data[start+FILENO_SIZE:end], 'little')
-
+        #print(fileno, pktno)
         priority_pkts.add((fileno,pktno))
 
         start = end
@@ -95,23 +96,36 @@ for fileno, data_file in enumerate(data_files[:FILE_NUM]):
     
 #shuffle
 #random.shuffle(raws)
-
+#while True:
 for fileno in range(FILE_NUM):
     for pktno in range(SEC_SIZE):
         #send  packet
-        priority_pktss = priority_pkts
+        priority_pktss |= priority_pkts
+        priority_pktss &= priority_pkts
+        print(priority_pktss)
         for priority_fileno, priority_pktno in priority_pktss:
             udp_send.sendto(raws[priority_fileno][priority_pktno], DST)
+            priority_pkts.discard((priority_fileno, priority_pktno))
+            print(priority_fileno,priority_pktno)
             time.sleep(SLEEP_TIME)
 
         udp_send.sendto(raws[fileno][pktno], DST)
         priority_pkts.discard((fileno, pktno))
+        priority_pktss.discard((fileno, pktno))
     
-        print("[*] Sended Data : File {} Pkt {} To {}".format(fileno, pktno, DST_IP))
-        priority_pkts.clear()
-        priority_pktss.clear()
+        #print("[*] Sended Data : File {} Pkt {} To {}".format(fileno, pktno, DST_IP))
+        # priority_pkts.clear()
+        # priority_pktss.clear()
         time.sleep(SLEEP_TIME)
 
 
 while True:
-    time.sleep(SLEEP_TIME)
+    priority_pktss |= priority_pkts
+    priority_pktss &= priority_pkts
+    print(priority_pktss)
+    for priority_fileno, priority_pktno in priority_pktss:
+        udp_send.sendto(raws[priority_fileno][priority_pktno], DST)
+        priority_pkts.discard((priority_fileno, priority_pktno))
+        print(priority_fileno,priority_pktno)
+        time.sleep(SLEEP_TIME)
+        
