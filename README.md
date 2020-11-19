@@ -1,4 +1,4 @@
-# Taro 送信 Hanako 受信
+# Taro send Hanako recv
 
 Taro(169.254.155.219)
 
@@ -8,7 +8,7 @@ Hanako(169.254.229.153)
 
 $ ./recv.py Hanako
 
-# Taro 受信 Hanako 送信
+# Taro recv Hanako send
 
 Taro(169.254.155.219)
 
