@@ -32,13 +32,14 @@ HEADER_SIZE = FILENO_SIZE + PKTNO_SIZE
 #file size
 FILE_NUM = int(sys.argv[2])
 FILE_SIZE = 102400
-SEC_SIZE = 100
+SEC_SIZE = 25
 DATA_SIZE = FILE_SIZE//SEC_SIZE
 PKT_SIZE = FILE_SIZE//SEC_SIZE + HEADER_SIZE
 RECV_SIZE = 300
+SPLIT_NUM = 10
 
-SLEEP_TIME = 0.0001
-INTERRUPT_TIME = 0.1
+SLEEP_TIME = 0.001
+INTERRUPT_TIME = 0.005
 #get files
 DATA_PATH = "./data/"
 data_files = os.listdir(DATA_PATH)
@@ -97,26 +98,30 @@ for fileno, data_file in enumerate(data_files[:FILE_NUM]):
 #shuffle
 #random.shuffle(raws)
 #while True:
+#for split_num in range(FILE_NUM//SPLIT_NUM):
 for fileno in range(FILE_NUM):
     for pktno in range(SEC_SIZE):
         #send  packet
         priority_pktss |= priority_pkts
         priority_pktss &= priority_pkts
         print(priority_pktss)
+        if not priority_pktss:
+            udp_send.sendto(raws[fileno][pktno], DST)
+            time.sleep(SLEEP_TIME)
+            priority_pkts.discard((fileno, pktno))
+        #priority_pktss.discard((fileno, pktno))
         for priority_fileno, priority_pktno in priority_pktss:
             udp_send.sendto(raws[priority_fileno][priority_pktno], DST)
             priority_pkts.discard((priority_fileno, priority_pktno))
             print(priority_fileno,priority_pktno)
-            time.sleep(SLEEP_TIME)
+            #time.sleep(SLEEP_TIME)
 
-        udp_send.sendto(raws[fileno][pktno], DST)
-        priority_pkts.discard((fileno, pktno))
-        priority_pktss.discard((fileno, pktno))
+       
     
         #print("[*] Sended Data : File {} Pkt {} To {}".format(fileno, pktno, DST_IP))
         # priority_pkts.clear()
         # priority_pktss.clear()
-        time.sleep(SLEEP_TIME)
+        #time.sleep(SLEEP_TIME)
 
 
 while True:
@@ -127,5 +132,5 @@ while True:
         udp_send.sendto(raws[priority_fileno][priority_pktno], DST)
         priority_pkts.discard((priority_fileno, priority_pktno))
         print(priority_fileno,priority_pktno)
-        time.sleep(SLEEP_TIME)
+        #time.sleep(SLEEP_TIME)
         
