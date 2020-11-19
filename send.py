@@ -107,13 +107,13 @@ for fileno in range(FILE_NUM):
         print(priority_pktss)
         if not priority_pktss:
             udp_send.sendto(raws[fileno][pktno], DST)
-            time.sleep(SLEEP_TIME)
+            #time.sleep(SLEEP_TIME)
             priority_pkts.discard((fileno, pktno))
         #priority_pktss.discard((fileno, pktno))
         for priority_fileno, priority_pktno in priority_pktss:
             udp_send.sendto(raws[priority_fileno][priority_pktno], DST)
             priority_pkts.discard((priority_fileno, priority_pktno))
-            print(priority_fileno,priority_pktno)
+            #print(priority_fileno,priority_pktno)
             #time.sleep(SLEEP_TIME)
 
        
@@ -127,10 +127,10 @@ for fileno in range(FILE_NUM):
 while True:
     priority_pktss |= priority_pkts
     priority_pktss &= priority_pkts
-    print(priority_pktss)
+    #print(priority_pktss)
     for priority_fileno, priority_pktno in priority_pktss:
         udp_send.sendto(raws[priority_fileno][priority_pktno], DST)
         priority_pkts.discard((priority_fileno, priority_pktno))
-        print(priority_fileno,priority_pktno)
-        #time.sleep(SLEEP_TIME)
+        #print(priority_fileno,priority_pktno)
+        time.sleep(SLEEP_TIME)
         

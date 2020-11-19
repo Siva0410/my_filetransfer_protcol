@@ -36,11 +36,11 @@ DATA_SIZE = FILE_SIZE//SEC_SIZE
 PKT_SIZE = FILE_SIZE//SEC_SIZE + HEADER_SIZE
 RECV_SIZE = 300
 
-SLEEP_TIME = 0.0001
+SLEEP_TIME = 0.0005
 INTERRUPT_TIME = 0.0005
 
 #get files
-RECV_PATH = "./recv/"
+RECV_PATH = "./data/"
 os.makedirs(RECV_PATH, exist_ok=True)
 
 #udp_recv 
