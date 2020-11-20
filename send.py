@@ -60,13 +60,11 @@ def recv_cannot_send(arg1, arg2):
     end = HEADER_SIZE
     for i in range(50):
         fileno, pktno = int.from_bytes(recv_binary_data[start:start+FILENO_SIZE], 'little'),int.from_bytes(recv_binary_data[start+FILENO_SIZE:end], 'little')
-        #print(fileno, pktno)
+
         priority_pkts.add((fileno,pktno))
 
         start = end
         end = start + HEADER_SIZE
-        
-    #print("[*] Received Data : Recv {} From {}".format(recv_data,recv_addr))
     
 signal.signal(signal.SIGALRM, recv_cannot_send)
 signal.setitimer(signal.ITIMER_REAL, INTERRUPT_TIME, INTERRUPT_TIME)
@@ -94,11 +92,7 @@ for fileno, data_file in enumerate(data_files[:FILE_NUM]):
 
     #close file
     f.close()    
-    
-#shuffle
-#random.shuffle(raws)
-#while True:
-#for split_num in range(FILE_NUM//SPLIT_NUM):
+
 for fileno in range(FILE_NUM):
     for pktno in range(SEC_SIZE):
         #send  packet
@@ -109,28 +103,20 @@ for fileno in range(FILE_NUM):
             udp_send.sendto(raws[fileno][pktno], DST)
             #time.sleep(SLEEP_TIME)
             priority_pkts.discard((fileno, pktno))
+            print("[*] Sended Data : File {} Pkt {} To {}".format(fileno, pktno, DST_IP))
         #priority_pktss.discard((fileno, pktno))
         for priority_fileno, priority_pktno in priority_pktss:
             udp_send.sendto(raws[priority_fileno][priority_pktno], DST)
             priority_pkts.discard((priority_fileno, priority_pktno))
-            #print(priority_fileno,priority_pktno)
-            #time.sleep(SLEEP_TIME)
-
-       
-    
-        #print("[*] Sended Data : File {} Pkt {} To {}".format(fileno, pktno, DST_IP))
-        # priority_pkts.clear()
-        # priority_pktss.clear()
-        #time.sleep(SLEEP_TIME)
+            print("[*] Sended Data : File {} Pkt {} To {}".format(priority_fileno, priority_pktno, DST_IP))
 
 
 while True:
     priority_pktss |= priority_pkts
     priority_pktss &= priority_pkts
-    #print(priority_pktss)
+
     for priority_fileno, priority_pktno in priority_pktss:
         udp_send.sendto(raws[priority_fileno][priority_pktno], DST)
         priority_pkts.discard((priority_fileno, priority_pktno))
-        #print(priority_fileno,priority_pktno)
         time.sleep(SLEEP_TIME)
         
