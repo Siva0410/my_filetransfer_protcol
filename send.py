@@ -98,7 +98,7 @@ for fileno in range(FILE_NUM):
         #send  packet
         priority_pktss |= priority_pkts
         priority_pktss &= priority_pkts
-        print(priority_pktss)
+
         if not priority_pktss:
             udp_send.sendto(raws[fileno][pktno], DST)
             #time.sleep(SLEEP_TIME)
