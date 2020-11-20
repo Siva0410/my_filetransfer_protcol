@@ -2,7 +2,7 @@
 import hashlib
 import os
 
-RECV_PATH = "./data/"
+RECV_PATH = "./recv/"
 
 filepath_list = []
 received_list = []

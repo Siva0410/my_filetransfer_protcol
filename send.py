@@ -41,7 +41,7 @@ SPLIT_NUM = 10
 SLEEP_TIME = 0.001
 INTERRUPT_TIME = 0.005
 #get files
-DATA_PATH = "/home/pi/robust/data/"
+DATA_PATH = "./data/"
 data_files = os.listdir(DATA_PATH)
 
 udp_send = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

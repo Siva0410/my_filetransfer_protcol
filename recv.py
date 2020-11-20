@@ -40,7 +40,7 @@ SLEEP_TIME = 0.0005
 INTERRUPT_TIME = 0.0005
 
 #get files
-RECV_PATH = "/home/pi/robust/data/"
+RECV_PATH = "./recv/"
 os.makedirs(RECV_PATH, exist_ok=True)
 
 #udp_recv 
