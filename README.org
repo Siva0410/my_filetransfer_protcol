@@ -1,4 +1,7 @@
 * ロバストプロトコル
+#+BEGIN_EXPORT html
+<img src="udptable.png">
+#+END_EXPORT
 50%のパケットが損失する10BASE-T Duplex上でファイルを転送する自作プロトコル
 
 ↓↓ロバストプロコル・オープンチャレンジ大会参加記兼解説↓↓
