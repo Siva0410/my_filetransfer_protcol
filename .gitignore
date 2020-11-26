@@ -2,4 +2,3 @@ data/*
 recv/*
 check.md5
 *.sh
-udptable.png
