@@ -1,0 +1,38 @@
+* ロバストプロトコル
+50%のパケットが損失する10BASE-T Duplex上でファイルを転送する自作プロトコル
+
+ロバストプロコル・オープンチャレンジ大会参加記
+
+https://www.honamium.net/blog/robust
+
+** 仕様
+#+BEGIN_EXPORT html
+<div class="g-slide">
+<iframe src="https://docs.google.com/presentation/d/e/2PACX-1vRajC1Sb9fbr7hWMoGmjxNoc7h7qlNxQmLHUB9S_mnyYPKmfFRzntQVXQ8l1IIz4geZXWMeiFsJMwBU/embed?start=false&loop=false&delayms=3000" frameborder="0" width="350" height="291" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
+</div>
+#+END_EXPORT
+
+** 使用方法
+転送用ファイル作成
+
+$ ./make_randomfile.py {作成したいファイル数}
+
+
+ファイルのハッシュ取得
+
+$ ./getmd5.py
+
+
+reciever起動
+
+$ ./recv.py local
+
+
+sender起動
+
+$ ./send.py 
+
+
+転送したファイルのハッシュ確認
+
+$ ./checkfile.py
